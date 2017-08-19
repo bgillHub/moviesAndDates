@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/refresh_movies"
+        android:title="Refresh">Refresh</item>
+    <item
+        android:id="@+id/sort_movies_name"
+        android:title="Sort by Name A-Z"></item>
+    <item
+        android:id="@+id/sort_movies_rating"
+        android:title="Sort by Popularity"></item>
+</menu>
