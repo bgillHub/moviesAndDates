@@ -1,7 +1,7 @@
 package com.example.android.brianspopularmovies.utilities;
 
-/**
- * Created by gilli on 8/10/2017.
+/*
+  Created by gilli on 8/10/2017.
  */
 
 /*
@@ -30,46 +30,32 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
-import android.net.Uri;
-import android.util.Log;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Scanner;
-
-/**
- * These utilities will be used to communicate with the weather servers.
- */
 public final class NetworkUtils {
 
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
 
+    //ToDo: Swap in your own API key!
     private static final String MOVIE_URL =
-            "https://api.themoviedb.org/3/discover/movie?api_key=2ad97c2d963ed91d0142264b827644b0";
+            "https://api.themoviedb.org/3/discover/movie?api_key=";
 
 
-    final static String QUERY_PARAM = "q";
-    final static String SORT_PARAM = "sort_by=";
-    final static String COUNTRY_PARAM = "certification_country=";
-    final static  String RELEASE_PARAM = "primary_release_year=";
-    final static String GENRE_PARAM = "with_genres=";
-    /**
-     * Builds the URL used to talk to the weather server using a location. This location is based
-     * on the query capabilities of the weather provider that we are using.
-     *
-     * @param movieQuery The location that will be queried for.
-     * @return The URL to use to query the weather server.
-     */
+    private final static String SORT_PARAM = "sort_by";
+    private final static  String VOTE_MINIMUM = "vote_count.gte";
+    private final static  String LANG = "language";
+    private final static String ORIG_LAN = "with_original_language";
+    final static String COUNTRY_PARAM = "certification_country";
+    final static  String RELEASE_PARAM = "primary_release_year";
+    final static String GENRE_PARAM = "with_genres";
+
     public static URL buildUrl(String movieQuery) {
+
         Uri builtUri = Uri.parse(MOVIE_URL).buildUpon()
-         //       .appendQueryParameter(QUERY_PARAM, movieQuery)
-         //       .appendQueryParameter(FORMAT_PARAM, format)
-         //       .appendQueryParameter(UNITS_PARAM, units)
-          //      .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
+                .appendQueryParameter(VOTE_MINIMUM, "500")
+                .appendQueryParameter(LANG, "en-us")
+                .appendQueryParameter(ORIG_LAN, "en")
+                .appendQueryParameter(SORT_PARAM, movieQuery)
                 .build();
 
         URL url = null;
@@ -82,19 +68,6 @@ public final class NetworkUtils {
         Log.v(TAG, "Built URI " + url);
 
         return url;
-    }
-
-    /**
-     * Builds the URL used to talk to the weather server using latitude and longitude of a
-     * location.
-     *
-     * @param lat The latitude of the location
-     * @param lon The longitude of the location
-     * @return The Url to use to query the weather server.
-     */
-    public static URL buildUrl(Double lat, Double lon) {
-        /** This will be implemented in a future lesson **/
-        return null;
     }
 
     /**

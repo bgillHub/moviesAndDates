@@ -2,11 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/refresh_movies"
-        android:title="Refresh">Refresh</item>
+        android:title="@string/opt_refresh" />
     <item
-        android:id="@+id/sort_movies_name"
-        android:title="Sort by Name A-Z"></item>
+        android:id="@+id/sort_movies_name_down"
+        android:title="@string/opt_sort_az" />
+    <item
+        android:id="@+id/sort_movies_name_up"
+        android:title="@string/opt_sort_za" />
     <item
         android:id="@+id/sort_movies_rating"
-        android:title="Sort by Popularity"></item>
+        android:title="@string/opt_sort_pop" />
+    <item
+        android:id="@+id/sort_movies_terrible"
+        android:title="@string/opt_sort_unpop" />
+    <item
+        android:id="@+id/sort_movies_votes"
+        android:title="@string/opt_sort_count" />
 </menu>

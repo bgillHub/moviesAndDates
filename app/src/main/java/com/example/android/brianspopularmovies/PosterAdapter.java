@@ -12,36 +12,33 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
-import java.net.URI;
 import java.util.List;
 
+import static com.example.android.brianspopularmovies.R.id.movie_rating;
+import static com.example.android.brianspopularmovies.R.id.movie_release;
 import static com.example.android.brianspopularmovies.R.id.movie_title;
 
 /**
  * Created by gilli on 8/10/2017.
  */
 
-public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterViewHolder> {
+class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterViewHolder> {
 
-    List<MoviePoster> movies;
-    String baseImgUrl = "http://image.tmdb.org/t/p/w185/";
-    public class PosterAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private final List<MoviePoster> movies;
+    private final String baseImgUrl = "http://image.tmdb.org/t/p/w185/";
+    class PosterAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        CardView moviecv;
-        TextView movieTitle;
-        TextView movieVotes;
-        TextView moviePlot;
-        TextView movieDate;
-        ImageView movieImage;
-        URI imageURL;
+        final TextView movieTitle;
+        final TextView movieVotes;
+        String moviePlot;
+        String movieURL;
+        final TextView movieDate;
+        final ImageView movieImage;
 
-        public PosterAdapterViewHolder(View view) {
+        PosterAdapterViewHolder(View view) {
             super(view);
             movieTitle = (TextView) view.findViewById(movie_title);
             movieVotes = (TextView) view.findViewById(R.id.movie_rating);
-            moviePlot = (TextView) view.findViewById(R.id.movie_plot);
             movieDate = (TextView) view.findViewById(R.id.movie_release);
             movieImage = (ImageView) view.findViewById(R.id.movie_image);
             //ToDo: Onclick, go to moviedetails activity with the poster as an extra
@@ -55,13 +52,20 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdap
          */
         @Override
         public void onClick(View v) {
-            loadDetails(v);
+            loadDetails(v, movieURL, moviePlot);
         }
     }
 
-    private void loadDetails(View v) {
-        TextView title = (TextView) v.findViewById(R.id.movie_title);
+    private void loadDetails(View v, String url, String plot) {
         Intent intent = new Intent(MainActivity.getAppContext(), MovieDetails.class);
+        String passTitle = (String) ((TextView) v.findViewById(movie_title)).getText();
+        String passRating =(String) ((TextView) v.findViewById(movie_rating)).getText();
+        String passDate = (String) ((TextView) v.findViewById(movie_release)).getText();
+        intent.putExtra("passedTitle",passTitle);
+        intent.putExtra("passedVote",passRating);
+        intent.putExtra("passedDate",passDate);
+        intent.putExtra("passedImage",url);
+        intent.putExtra("passedPlot", plot);
         MainActivity.getAppContext().startActivity(intent);
     }
 
@@ -71,7 +75,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdap
         int layoutIdForListItem = R.layout.movie_card;
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
-        CardView view = (CardView) inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
+        CardView view = (CardView) inflater.inflate(layoutIdForListItem, parent, false);
         return new PosterAdapterViewHolder(view);
     }
 
@@ -79,9 +83,10 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdap
     public void onBindViewHolder(PosterAdapterViewHolder posterHolder, int position) {
         MoviePoster loadee = movies.get(position);
         posterHolder.movieTitle.setText(loadee.title);
-        posterHolder.moviePlot.setText(loadee.plot);
         posterHolder.movieVotes.setText(loadee.vote);
         posterHolder.movieDate.setText(loadee.releaseDate);
+        posterHolder.movieURL = loadee.imageURL;
+        posterHolder.moviePlot = loadee.plot;
         Picasso.with(MainActivity.getAppContext()).load(baseImgUrl + loadee.imageURL).into(posterHolder.movieImage);
         // posterHolder.movieImage.setImageURI(movies.get(position).imageURL);
     }
@@ -91,10 +96,6 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdap
     public int getItemCount() {
         if (movies == null) return 0;
         return movies.size();
-    }
-    @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-        super.onAttachedToRecyclerView(recyclerView);
     }
 
     PosterAdapter(List<MoviePoster> movies){

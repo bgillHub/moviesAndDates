@@ -4,14 +4,12 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -22,17 +20,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Console;
 import java.net.URL;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    ProgressBar loadingSpinner;
-    private  RecyclerView.Adapter posterAdapter;
-    private RecyclerView moviesArea;
-    private Button loader;
     private static Context context;
+    private ProgressBar loadingSpinner;
+    private RecyclerView moviesArea;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,12 +36,10 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager posterLayoutManager = new LinearLayoutManager(this);
         loadingSpinner = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         moviesArea = (RecyclerView) findViewById(R.id.recyclerview_movies);
-        moviesArea.setAdapter(posterAdapter);
         moviesArea.setLayoutManager(posterLayoutManager);
         new MovieFetcherTask().execute("");
     }
-    public class MovieFetcherTask extends AsyncTask<String, Void, JSONArray> {
-
+    private class MovieFetcherTask extends AsyncTask<String, Void, JSONArray> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -61,18 +54,14 @@ public class MainActivity extends AppCompatActivity {
             if (params.length == 0) {
                 return null;
             }
-
-            String movies = params[0];
-            URL movieRequestURL = NetworkUtils.buildUrl(movies);
+            URL movieRequestURL = NetworkUtils.buildUrl(params[0]);
 
             try {
                 String jsonMovies = NetworkUtils
                         .getResponseFromHttpUrl(movieRequestURL);
 
-                JSONArray moviePagesData = OpenMovieDataUtils
-                        .getMovieCards(MainActivity.this, jsonMovies);
-
-                return moviePagesData;
+                return OpenMovieDataUtils
+                        .getMoviePages(jsonMovies);
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
@@ -113,15 +102,26 @@ public class MainActivity extends AppCompatActivity {
             new MovieFetcherTask().execute("");
             return true;
         }
-        if (id== R.id.sort_movies_name){
-            new MovieFetcherTask().execute("");
+        if (id== R.id.sort_movies_name_down){
+            new MovieFetcherTask().execute("original_title.asc");
+            return true;
+        }
+        if (id== R.id.sort_movies_name_up){
+            new MovieFetcherTask().execute("original_title.desc");
             return true;
         }
         if (id == R.id.sort_movies_rating){
-            new MovieFetcherTask().execute("");
+            new MovieFetcherTask().execute("vote_average.desc");
             return true;
         }
-
+        if (id == R.id.sort_movies_terrible){
+            new MovieFetcherTask().execute("vote_average.asc");
+            return true;
+        }
+        if (id == R.id.sort_movies_votes){
+            new MovieFetcherTask().execute("vote_count.desc");
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
     private void showErrorMessage(){
@@ -139,16 +139,13 @@ public class MainActivity extends AppCompatActivity {
             String plot = singleDatum.getString("overview");
             int vote = singleDatum.getInt("vote_average");
             movies.add(new MoviePoster(title, posterPath, release, vote, plot));
-            System.out.println("Poster Added: " + title);
-            System.out.println("Poster Added: " + release);
-            System.out.println("Poster Added: " + plot);
         }
         PosterAdapter mAdapter = new PosterAdapter(movies);
         moviesArea.setAdapter(mAdapter);
-        Toast.makeText(this, "Complete!", Toast.LENGTH_LONG);
+        Toast.makeText(this, "Search Complete", Toast.LENGTH_LONG).show();
     }
 
-    public static  Context getAppContext(){
+    public static Context getAppContext(){
         return context;
     }
 }

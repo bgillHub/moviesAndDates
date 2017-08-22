@@ -1,6 +1,13 @@
 <resources>
-    <string name="app_name">BriansPopularMovies</string>
+    <string name="app_name">Recent and Popular Movies</string>
     <string name="title_activity_movie_details">MovieDetails</string>
-    <string name="movie_app_title">Find the Perfect Date Night</string>
+    <string name="movie_app_title">Catch The Best (Worst) Movie</string>
     <string name="error">Error</string>
+    <string name="poster_desc">Center Area For Poster</string>
+    <string name="opt_refresh">Refresh</string>
+    <string name="opt_sort_az">Sort by Name A-Z</string>
+    <string name="opt_sort_za">Sort by Name Z-A</string>
+    <string name="opt_sort_pop">Sort by Popularity</string>
+    <string name="opt_sort_unpop">Find Hated Movies</string>
+    <string name="opt_sort_count">Most Voted</string>
 </resources>

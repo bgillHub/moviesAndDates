@@ -1,21 +1,16 @@
 package com.example.android.brianspopularmovies;
 
-import android.graphics.Bitmap;
-import android.net.Uri;
-
-import java.net.URI;
-import java.net.URL;
 
 /**
  * Created by gilli on 8/15/2017.
  */
 
-public class MoviePoster {
-    String title;
-    String imageURL;
-    String releaseDate;
-    String vote;
-    String plot;
+class MoviePoster {
+    final String title;
+    final String imageURL;
+    final String releaseDate;
+    final String vote;
+    final String plot;
 
     MoviePoster(String title, String imageURL, String releaseDate, int vote, String plot){
         this.title = title;
