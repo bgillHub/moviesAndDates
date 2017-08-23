@@ -14,9 +14,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import static com.example.android.brianspopularmovies.R.id.movie_rating;
-import static com.example.android.brianspopularmovies.R.id.movie_release;
-import static com.example.android.brianspopularmovies.R.id.movie_title;
+
 
 /**
  * Created by gilli on 8/10/2017.
@@ -28,18 +26,15 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
     private final String baseImgUrl = "http://image.tmdb.org/t/p/w185/";
     class PosterAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        final TextView movieTitle;
-        final TextView movieVotes;
+        String movieTitle;
+        String movieDate;
+        String movieRating;
         String moviePlot;
         String movieURL;
-        final TextView movieDate;
         final ImageView movieImage;
 
         PosterAdapterViewHolder(View view) {
             super(view);
-            movieTitle = (TextView) view.findViewById(movie_title);
-            movieVotes = (TextView) view.findViewById(R.id.movie_rating);
-            movieDate = (TextView) view.findViewById(R.id.movie_release);
             movieImage = (ImageView) view.findViewById(R.id.movie_image);
             //ToDo: Onclick, go to moviedetails activity with the poster as an extra
             view.setOnClickListener(this);
@@ -52,15 +47,12 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
          */
         @Override
         public void onClick(View v) {
-            loadDetails(v, movieURL, moviePlot);
+            loadDetails(v, movieTitle, movieRating, movieDate, movieURL, moviePlot);
         }
     }
 
-    private void loadDetails(View v, String url, String plot) {
+    private void loadDetails(View v, String passTitle, String passRating, String passDate, String url, String plot) {
         Intent intent = new Intent(MainActivity.getAppContext(), MovieDetails.class);
-        String passTitle = (String) ((TextView) v.findViewById(movie_title)).getText();
-        String passRating =(String) ((TextView) v.findViewById(movie_rating)).getText();
-        String passDate = (String) ((TextView) v.findViewById(movie_release)).getText();
         intent.putExtra("passedTitle",passTitle);
         intent.putExtra("passedVote",passRating);
         intent.putExtra("passedDate",passDate);
@@ -82,9 +74,9 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
     @Override
     public void onBindViewHolder(PosterAdapterViewHolder posterHolder, int position) {
         MoviePoster loadee = movies.get(position);
-        posterHolder.movieTitle.setText(loadee.title);
-        posterHolder.movieVotes.setText(loadee.vote);
-        posterHolder.movieDate.setText(loadee.releaseDate);
+        posterHolder.movieTitle = loadee.title;
+        posterHolder.movieDate = loadee.releaseDate;
+        posterHolder.movieRating = loadee.vote;
         posterHolder.movieURL = loadee.imageURL;
         posterHolder.moviePlot = loadee.plot;
         Picasso.with(MainActivity.getAppContext()).load(baseImgUrl + loadee.imageURL).into(posterHolder.movieImage);

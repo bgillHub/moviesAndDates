@@ -5,7 +5,6 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview_movies"
-        android:layout_margin="5dp"
         android:layout_centerHorizontal="true"
         android:layout_width="match_parent"
         android:layout_alignParentTop="true"

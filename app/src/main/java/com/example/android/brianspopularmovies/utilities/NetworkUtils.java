@@ -37,11 +37,13 @@ public final class NetworkUtils {
 
 
     //ToDo: Swap in your own API key!
-    private static final String MOVIE_URL =
-            "https://api.themoviedb.org/3/discover/movie?api_key=";
+    private static final String POP_MOVIE_URL =
+            "https://api.themoviedb.org/3/movie/popular?api_key=";
 
+    private static  final String TOP_MOVIE_URL =
+            "https://api.themoviedb.org/3/movie/top_rated?api_key=";
 
-    private final static String SORT_PARAM = "sort_by";
+    //private final static String SORT_PARAM = "sort_by";
     private final static  String VOTE_MINIMUM = "vote_count.gte";
     private final static  String LANG = "language";
     private final static String ORIG_LAN = "with_original_language";
@@ -49,13 +51,19 @@ public final class NetworkUtils {
     final static  String RELEASE_PARAM = "primary_release_year";
     final static String GENRE_PARAM = "with_genres";
 
-    public static URL buildUrl(String movieQuery) {
-
-        Uri builtUri = Uri.parse(MOVIE_URL).buildUpon()
+    public static URL buildUrl(int movieQuery) {
+        String passURL = POP_MOVIE_URL;
+        if( movieQuery == 0) {
+            passURL = POP_MOVIE_URL;
+        }
+        if (movieQuery == 1) {
+            passURL = TOP_MOVIE_URL;
+        }
+        Uri builtUri = Uri.parse(passURL).buildUpon()
                 .appendQueryParameter(VOTE_MINIMUM, "500")
                 .appendQueryParameter(LANG, "en-us")
                 .appendQueryParameter(ORIG_LAN, "en")
-                .appendQueryParameter(SORT_PARAM, movieQuery)
+              //  .appendQueryParameter(SORT_PARAM, movieQuery)
                 .build();
 
         URL url = null;

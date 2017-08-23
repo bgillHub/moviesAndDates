@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -36,10 +37,10 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager posterLayoutManager = new LinearLayoutManager(this);
         loadingSpinner = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         moviesArea = (RecyclerView) findViewById(R.id.recyclerview_movies);
-        moviesArea.setLayoutManager(posterLayoutManager);
-        new MovieFetcherTask().execute("");
+        moviesArea.setLayoutManager(new GridLayoutManager(this, 3));
+        new MovieFetcherTask().execute(0);
     }
-    private class MovieFetcherTask extends AsyncTask<String, Void, JSONArray> {
+    private class MovieFetcherTask extends AsyncTask<Integer, Void, JSONArray> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected JSONArray doInBackground(String... params) {
+        protected JSONArray doInBackground(Integer... params) {
 
             /* If there's no zip code, there's nothing to look up. */
             if (params.length == 0) {
@@ -98,28 +99,12 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.refresh_movies) {
-            new MovieFetcherTask().execute("");
-            return true;
-        }
-        if (id== R.id.sort_movies_name_down){
-            new MovieFetcherTask().execute("original_title.asc");
-            return true;
-        }
-        if (id== R.id.sort_movies_name_up){
-            new MovieFetcherTask().execute("original_title.desc");
-            return true;
-        }
         if (id == R.id.sort_movies_rating){
-            new MovieFetcherTask().execute("vote_average.desc");
-            return true;
-        }
-        if (id == R.id.sort_movies_terrible){
-            new MovieFetcherTask().execute("vote_average.asc");
+            new MovieFetcherTask().execute(0);
             return true;
         }
         if (id == R.id.sort_movies_votes){
-            new MovieFetcherTask().execute("vote_count.desc");
+            new MovieFetcherTask().execute(1);
             return true;
         }
         return super.onOptionsItemSelected(item);
