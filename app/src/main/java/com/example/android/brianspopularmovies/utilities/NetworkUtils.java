@@ -20,8 +20,11 @@ package com.example.android.brianspopularmovies.utilities;
  * limitations under the License.
  */
 
+import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
+
+import com.example.android.brianspopularmovies.data.AppPreferences;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,10 +41,8 @@ public final class NetworkUtils {
 
     //ToDo: Swap in your own API key!
     private static final String POP_MOVIE_URL =
-            "https://api.themoviedb.org/3/movie/popular?api_key=";
 
     private static  final String TOP_MOVIE_URL =
-            "https://api.themoviedb.org/3/movie/top_rated?api_key=";
 
     //private final static String SORT_PARAM = "sort_by";
     private final static  String VOTE_MINIMUM = "vote_count.gte";
@@ -50,6 +51,10 @@ public final class NetworkUtils {
     final static String COUNTRY_PARAM = "certification_country";
     final static  String RELEASE_PARAM = "primary_release_year";
     final static String GENRE_PARAM = "with_genres";
+
+    public static URL getUrl(Context context) {
+        return buildUrl(0);
+    }
 
     public static URL buildUrl(int movieQuery) {
         String passURL = POP_MOVIE_URL;

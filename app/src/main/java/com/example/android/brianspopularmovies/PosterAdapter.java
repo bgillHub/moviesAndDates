@@ -2,6 +2,7 @@ package com.example.android.brianspopularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,6 +25,13 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
 
     private final List<MoviePoster> movies;
     private final String baseImgUrl = "http://image.tmdb.org/t/p/w185/";
+    private Cursor mCursor;
+
+    public void swapCursor(Cursor data) {
+        mCursor = data;
+        notifyDataSetChanged();
+    }
+
     class PosterAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         String movieTitle;
@@ -73,6 +81,7 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
 
     @Override
     public void onBindViewHolder(PosterAdapterViewHolder posterHolder, int position) {
+        mCursor.moveToPosition(position);
         MoviePoster loadee = movies.get(position);
         posterHolder.movieTitle = loadee.title;
         posterHolder.movieDate = loadee.releaseDate;

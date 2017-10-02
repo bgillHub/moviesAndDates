@@ -10,4 +10,10 @@
     <string name="opt_sort_pop">Most Popular Movies</string>
     <string name="opt_sort_unpop">Find Hated Movies</string>
     <string name="opt_sort_count">Top Rated Movies</string>
+    <string name="pref_enable_notifications_key">true</string>
+    <string name="pref_last_notification">LAST_NOTI</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="content_authority">com.example.android.brianspopularmovies</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
