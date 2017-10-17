@@ -1,8 +1,12 @@
 package com.example.android.brianspopularmovies;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,12 +24,31 @@ public class MovieDetails extends AppCompatActivity {
         TextView moviePlot = (TextView) this.findViewById(R.id.selected_movie_plot);
         TextView movieDate = (TextView) this.findViewById(R.id.selected_movie_release);
         ImageView movieImage = (ImageView) this.findViewById(R.id.selected_movie_image);
-        Intent intent = getIntent();
+        ImageButton faveButton = (ImageButton) this.findViewById(R.id.selected_movie_favorite);
+        ImageButton trailerPlay = (ImageButton) this.findViewById(R.id.selected_movie_trailer);
+        final Intent intent = getIntent();
+        final String url = intent.getStringExtra("passedVideo");
+        if ( url!= null)
+        trailerPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + url));
+                    Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                            Uri.parse("http://www.youtube.com/watch?v=" + url));
+                    try {
+                        v.getContext().startActivity(appIntent);
+                    } catch (ActivityNotFoundException ex) {
+                        v.getContext().startActivity(webIntent);
+                    }
+                }
+            }
+        );
         String title = intent.getStringExtra("passedTitle");
         String vote = intent.getStringExtra("passedVote");
         String plot = intent.getStringExtra("passedPlot");
         String date = intent.getStringExtra("passedDate");
         String image = intent.getStringExtra("passedImage");
+        String video = intent.getStringExtra("passedVideo");
         if (title != null)
         {
             movieTitle.setText(title);

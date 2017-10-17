@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -32,17 +33,18 @@ import org.json.JSONObject;
 import java.net.URL;
 import java.util.ArrayList;
 
+import static android.R.attr.data;
+
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor>
 {
 
     private static Context context;
     private ProgressBar loadingSpinner;
-    private RecyclerView moviesArea;
+    private static RecyclerView moviesArea;
     private static final int ID_LOADER = 44;
-    private PosterAdapter mPosterAdapter;
+    private static PosterAdapter mPosterAdapter;
     private int mPosition = RecyclerView.NO_POSITION;
-
     public static final String[] MAIN_MOVIE = {
             MoviesContract.MovieEntry.COLUMN_MOVIE_ID,
             MoviesContract.MovieEntry.COLUMN_MOVIE,
@@ -55,9 +57,11 @@ public class MainActivity extends AppCompatActivity implements
         context = getApplicationContext();
         setContentView(R.layout.activity_main);
         getSupportActionBar().setElevation(0f);
-        LinearLayoutManager posterLayoutManager = new LinearLayoutManager(this);
+        mPosterAdapter = new PosterAdapter(null);
         loadingSpinner = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         moviesArea = (RecyclerView) findViewById(R.id.recyclerview_movies);
+        moviesArea.setAdapter(mPosterAdapter);
+        moviesArea.setHasFixedSize(true);
         moviesArea.setLayoutManager(new GridLayoutManager(this, 3));
         getSupportLoaderManager().initLoader(ID_LOADER, null, this);
         SyncUtils.initialize(this);
@@ -102,6 +106,9 @@ public class MainActivity extends AppCompatActivity implements
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        //ToDo: Add params for long term settings?
+        new MovieLoader(this,0);
+
     }
 
     @Override
@@ -109,51 +116,7 @@ public class MainActivity extends AppCompatActivity implements
         mPosterAdapter.swapCursor(null);
     }
 
-    /*private class MovieFetcherTask extends AsyncTask<Integer, Void, JSONArray> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            System.out.println("GETTING READY");
-            loadingSpinner.setVisibility(View.VISIBLE);
-        }
 
-        @Override
-        protected JSONArray doInBackground(Integer... params) {
-
-            /* If there's no zip code, there's nothing to look up. */
-      /*      if (params.length == 0) {
-                return null;
-            }
-            URL movieRequestURL = NetworkUtils.buildUrl(params[0]);
-
-            try {
-                String jsonMovies = NetworkUtils
-                        .getResponseFromHttpUrl(movieRequestURL);
-
-                return OpenMovieDataUtils
-                        .getMoviePages(context, jsonMovies);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(JSONArray movies) {
-            loadingSpinner.setVisibility(View.INVISIBLE);
-            if (movies != null) {
-                try {
-                    showMovieCards(movies);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    showErrorMessage();
-                }
-                System.out.print("JSON RESPONSE: "+ movies);
-            } else {
-                showErrorMessage();
-            }
-        }
-    } */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         /* Use AppCompatActivity's method getMenuInflater to get a handle on the menu inflater */
@@ -166,43 +129,101 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        URL movieRequestURL = NetworkUtils.buildUrl(0);
-        try {
-            String jsonMovies = NetworkUtils
-                    .getResponseFromHttpUrl(movieRequestURL);
-
-            OpenMovieDataUtils
-                    .getMoviePages(context, jsonMovies);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return true;
+        switch (item.getItemId()) {
+            case R.id.sort_movies_rating:
+              //  mLoader.CHOSEN = 1;
+                //mLoader.loadInBackground();
+                new MovieLoader(this,1);
+                return true;
+            case R.id.sort_movies_votes:
+              //  mLoader.CHOSEN = 2;
+              //  mLoader.loadInBackground();
+                new MovieLoader(this,2);
+                return true;
+            default:
+              //  ToDo: Load up the favorites
+              //  mLoader.loadInBackground();
+                new MovieLoader(this,0);
+                return true;
         }
-
-        return super.onOptionsItemSelected(item);
     }
     private void showErrorMessage(){
         Toast.makeText(this, "There Was An Error!", Toast.LENGTH_LONG).show();
     }
-    private void showMovieCards(JSONArray movieData) throws JSONException {
+    private static void showMovieCards(JSONArray movieData) throws JSONException {
         ArrayList<MoviePoster> movies = new ArrayList<>();
         System.out.println("Showing cards!");
         for (int i = 0; i < movieData.length(); i++){
            // movies.add(i);
             JSONObject singleDatum = movieData.getJSONObject(i);
             String title = singleDatum.getString("title");
+            int id = singleDatum.getInt("id");
             String posterPath = singleDatum.getString("poster_path");
             String release = singleDatum.getString("release_date");
             String plot = singleDatum.getString("overview");
             int vote = singleDatum.getInt("vote_average");
-            movies.add(new MoviePoster(title, posterPath, release, vote, plot));
+            movies.add(new MoviePoster(title, posterPath, release, vote, plot,id));
         }
         mPosterAdapter = new PosterAdapter(movies);
         moviesArea.setAdapter(mPosterAdapter);
-        Toast.makeText(this, "Search Complete", Toast.LENGTH_LONG).show();
+        Toast.makeText(getAppContext(), "Search Complete", Toast.LENGTH_LONG).show();
     }
 
     public static Context getAppContext(){
         return context;
     }
+
+    class MovieLoader extends AsyncTaskLoader{
+
+        private Boolean dataIsReady;
+        int CHOSEN;
+        private  int loadOption = 1;
+        MovieLoader(Context context, int param) {
+            super(context);
+            CHOSEN = param;
+            forceLoad();
+        }
+
+        @Override
+        public Object loadInBackground() {
+            try {
+                URL movieRequestURL = NetworkUtils.buildUrl(CHOSEN);
+
+                String jsonMovies = NetworkUtils
+                        .getResponseFromHttpUrl(movieRequestURL);
+
+                final JSONArray m = OpenMovieDataUtils
+                        .getMoviePagesNew(context, jsonMovies);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            showMovieCards(m);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                return true;
+            }
+            return true;
+        }
+        @Override
+        protected void onStartLoading() {
+            if(dataIsReady) {
+                deliverResult(data);
+            } else {
+                forceLoad();
+            }
+        }
+
+        @Override
+        protected void onStopLoading() {
+            cancelLoad();
+            dataIsReady = true;
+        }
+    }
+
 }

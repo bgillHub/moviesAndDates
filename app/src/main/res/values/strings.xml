@@ -4,7 +4,7 @@
     <string name="movie_app_title">Catch The Best (Worst) Movie</string>
     <string name="error">Error</string>
     <string name="poster_desc">Center Area For Poster</string>
-    <string name="opt_refresh">Refresh</string>
+    <string name="opt_favorites">Favorites</string>
     <string name="opt_sort_az">Sort by Name A-Z</string>
     <string name="opt_sort_za">Sort by Name Z-A</string>
     <string name="opt_sort_pop">Most Popular Movies</string>
@@ -15,5 +15,10 @@
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="content_authority">com.example.android.brianspopularmovies</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="api_query_base">https://api.themoviedb.org/3/movie</string>
+    <string name="query_top">/top_rated?</string>
+    <string name="query_pop">/popular?</string>
+    <string name="api_key">api_key=</string>
+    <string name="favorite_description">A Favorite Button</string>
+    <string name="api_yt_query_base">\??</string>
 </resources>

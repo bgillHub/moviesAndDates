@@ -24,7 +24,10 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.android.brianspopularmovies.R;
 import com.example.android.brianspopularmovies.data.AppPreferences;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,10 +43,12 @@ public final class NetworkUtils {
 
 
     //ToDo: Swap in your own API key!
-    private static final String POP_MOVIE_URL =
+    private static String POP_MOVIE_URL;
 
-    private static  final String TOP_MOVIE_URL =
+    private static String TOP_MOVIE_URL;
 
+    private static String QUERY_BASE;
+    private static String QUERY_KEY;
     //private final static String SORT_PARAM = "sort_by";
     private final static  String VOTE_MINIMUM = "vote_count.gte";
     private final static  String LANG = "language";
@@ -52,40 +57,38 @@ public final class NetworkUtils {
     final static  String RELEASE_PARAM = "primary_release_year";
     final static String GENRE_PARAM = "with_genres";
 
-    public static URL getUrl(Context context) {
-        return buildUrl(0);
+    public static URL getUrl(Context context, int option) {
+        POP_MOVIE_URL = context.getResources().getString(R.string.query_pop);
+        TOP_MOVIE_URL = context.getResources().getString(R.string.query_top);
+        QUERY_BASE = context.getResources().getString(R.string.api_query_base);
+        QUERY_KEY = context.getResources().getString(R.string.api_key);
+        return buildUrl(option);
     }
 
     public static URL buildUrl(int movieQuery) {
-        String passURL = POP_MOVIE_URL;
-        if( movieQuery == 0) {
-            passURL = POP_MOVIE_URL;
+        String passURL = QUERY_BASE;
+        //ToDo: Alt case for favorites
+        if( movieQuery == 1) {
+            passURL += POP_MOVIE_URL+QUERY_KEY;
         }
-        if (movieQuery == 1) {
-            passURL = TOP_MOVIE_URL;
+        else if (movieQuery == 2) {
+            passURL += TOP_MOVIE_URL+QUERY_KEY;
         }
         Uri builtUri = Uri.parse(passURL).buildUpon()
                 .appendQueryParameter(VOTE_MINIMUM, "500")
                 .appendQueryParameter(LANG, "en-us")
                 .appendQueryParameter(ORIG_LAN, "en")
-              //  .appendQueryParameter(SORT_PARAM, movieQuery)
                 .build();
-
         URL url = null;
         try {
             url = new URL(builtUri.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-
-        Log.v(TAG, "Built URI " + url);
-
         return url;
     }
 
     /**
-     * This method returns the entire result from the HTTP response.
-     *
      * @param url The URL to fetch the HTTP response from.
      * @return The contents of the HTTP response.
      * @throws IOException Related to network and stream reading
@@ -107,5 +110,26 @@ public final class NetworkUtils {
         } finally {
             urlConnection.disconnect();
         }
+    }
+
+    public static URL getYouTubeUrl(Context context, int id) {
+        QUERY_BASE = context.getResources().getString(R.string.api_query_base);
+        QUERY_KEY = context.getResources().getString(R.string.api_key);
+        return buildYTUrl(id);
+    }
+
+    public static URL buildYTUrl(int movieID) {
+        String passURL = QUERY_BASE;
+        //ToDo: Alt case for favorites
+        passURL += ("/".concat(String.valueOf(movieID)).concat("/videos?").concat(QUERY_KEY));
+        Uri builtUri = Uri.parse(passURL).buildUpon()
+                .build();
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return url;
     }
 }

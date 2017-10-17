@@ -29,6 +29,7 @@ public class OpenMovieDataUtils {
 
     private static final String OWM_MESSAGE_CODE = "cod";
 
+    //ToDo: this method collects the previous favorites!!
     public static ContentValues[] getMoviePages(Context context, String jsonResponse) throws JSONException {
         JSONObject movieJson = new JSONObject(jsonResponse);
         /* Is there an error? */
@@ -47,7 +48,7 @@ public class OpenMovieDataUtils {
             }
         }
 
-        JSONArray jsonArray = movieJson.getJSONArray("movies");
+        JSONArray jsonArray = movieJson.getJSONArray("results");
         //AppPreferences.setLocationDetails(context, cityLatitude, cityLongitude);
 
         ContentValues[] appContentValues = new ContentValues[jsonArray.length()];
@@ -64,7 +65,7 @@ public class OpenMovieDataUtils {
 
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject mObject = (JSONObject) jsonArray.get(i);
-           String movieUrl = (String) mObject.get("Path");
+           String movieUrl = String.valueOf((int) mObject.get("id"));
 
 
             ContentValues appValues = new ContentValues();
@@ -74,5 +75,28 @@ public class OpenMovieDataUtils {
         }
 
         return appContentValues;
+    }
+
+    public static JSONArray getMoviePagesNew(Context context, String jsonResponse) throws JSONException {
+        JSONObject movieJson = new JSONObject(jsonResponse);
+        /* Is there an error? */
+        if (movieJson.has(OWM_MESSAGE_CODE)) {
+            int errorCode = movieJson.getInt(OWM_MESSAGE_CODE);
+
+            switch (errorCode) {
+                case HttpURLConnection.HTTP_OK:
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    /* Location invalid */
+                    return null;
+                default:
+                    /* Server probably down */
+                    return null;
+            }
+        }
+
+        JSONArray jsonArray = movieJson.getJSONArray("results");
+
+        return jsonArray;
     }
 }

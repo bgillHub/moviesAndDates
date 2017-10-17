@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.graphics.Movie;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.example.android.brianspopularmovies.data.MoviesContract;
 import com.firebase.jobdispatcher.Constraint;
@@ -27,7 +28,7 @@ public class SyncUtils {
     private static final int SYNC_INTERVAL_HOURS = 3;
     private static final int SYNC_INTERVAL_SECONDS = (int) TimeUnit.HOURS.toSeconds(SYNC_INTERVAL_HOURS);
     private static final int SYNC_FLEXTIME_SECONDS = SYNC_INTERVAL_SECONDS / 3;
-    private static final String SUNSHINE_SYNC_TAG = "sunshine-sync";
+    private static final String SYNC_TAG = "movies-sync";
 
     private static boolean sInitialized;
 
@@ -39,11 +40,11 @@ public class SyncUtils {
         FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(driver);
 
         /* Create the Job to periodically sync Sunshine */
-        Job syncSunshineJob = dispatcher.newJobBuilder()
+        Job syncJob = dispatcher.newJobBuilder()
                 /* The Service that will be used to sync Sunshine's data */
                 .setService(MovieFirebaseJobService.class)
                 /* Set the UNIQUE tag used to identify this Job */
-                .setTag(SUNSHINE_SYNC_TAG)
+                .setTag(SYNC_TAG)
                 /*
                  * Network constraints on which this Job should run. We choose to run on any
                  * network, but you can also choose to run only on un-metered networks or when the
@@ -79,7 +80,7 @@ public class SyncUtils {
                 .build();
 
         /* Schedule the Job with the dispatcher */
-        dispatcher.schedule(syncSunshineJob);
+        dispatcher.schedule(syncJob);
     }
 
     synchronized public static void initialize(@NonNull final Context context)
@@ -110,7 +111,7 @@ public class SyncUtils {
             public void run() {
 
                 /* URI for every row of weather data in our weather table*/
-                Uri forecastQueryUri = MoviesContract.MovieEntry.CONTENT_URI;
+                Uri movieQueryUri = MoviesContract.MovieEntry.CONTENT_URI;
 
                 /*
                  * Since this query is going to be used only as a check to see if we have any
@@ -118,12 +119,12 @@ public class SyncUtils {
                  * row. In our queries where we display data, we need to PROJECT more columns
                  * to determine what weather details need to be displayed.
                  */
-                String[] projectionColumns = {MoviesContract.MovieEntry._ID};
+                String[] projectionColumns = {MoviesContract.MovieEntry.COLUMN_MOVIE_ID};
                 String selectionStatement = MoviesContract.MovieEntry.getSqlSelectForFavorites();
 
                 /* Here, we perform the query to check to see if we have any weather data */
                 Cursor cursor = context.getContentResolver().query(
-                        forecastQueryUri,
+                        movieQueryUri,
                         projectionColumns,
                         selectionStatement,
                         null,
@@ -144,14 +145,16 @@ public class SyncUtils {
                  */
                 if (null == cursor || cursor.getCount() == 0) {
                     startImmediateSync(context);
+                    Log.d("CURSOR","MAKIN CURSOR");
                 }
 
                 /* Make sure to close the Cursor to avoid memory leaks! */
-                cursor.close();
+                else cursor.close();
             }
         });
 
         /* Finally, once the thread is prepared, fire it off to perform our checks. */
+        System.out.print("Fail?");
         checkForEmpty.start();
     }
 

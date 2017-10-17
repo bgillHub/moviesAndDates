@@ -10,11 +10,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DbHelper extends SQLiteOpenHelper{
 
-    public static final String DB_NAME = "weather.db";
+    public static final String DB_NAME = "movies.db";
     public static final String TABLE_NAME = "Favorites";
     private static final int DATABASE_VERSION = 1;
 
-    public DbHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+    public DbHelper(Context context) {
         super(context, DB_NAME, null, DATABASE_VERSION);
     }
 

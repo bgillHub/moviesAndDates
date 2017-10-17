@@ -10,12 +10,12 @@ import android.provider.BaseColumns;
 public class MoviesContract {
 
     public static final class MovieEntry implements BaseColumns {
-        public static final String CONTENT_AUTHORITY = "";
+        public static final String CONTENT_AUTHORITY = "com.example.android.brianspopularmovies";
         public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
-        public static final String PATH_WEATHER = "movies";
+        public static final String PATH_MOVIES = "movies";
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
-                .appendPath(PATH_WEATHER)
+                .appendPath(PATH_MOVIES)
                 .build();
 
         public static final String TABLE_NAME = "FAVORITES";
@@ -40,10 +40,7 @@ public class MoviesContract {
         }
 
         /**
-         * Returns just the selection part of the weather query from a normalized today value.
-         * This is used to get a weather forecast from today's date. To make this easy to use
-         * in compound selection, we embed today's date as an argument in the query.
-         *
+
          * @return The selection part of the weather query for today onwards
          */
         public static String getSqlSelectForFavorites() {

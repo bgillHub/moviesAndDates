@@ -11,12 +11,14 @@ class MoviePoster {
     final String releaseDate;
     final String vote;
     final String plot;
+    final int id;
 
-    MoviePoster(String title, String imageURL, String releaseDate, int vote, String plot){
+    MoviePoster(String title, String imageURL, String releaseDate, int vote, String plot, int id){
         this.title = title;
         this.imageURL = imageURL;
         this.releaseDate = releaseDate;
         this.vote = String.valueOf(vote);
         this.plot = plot;
+        this.id = id;
     }
 }

@@ -3,6 +3,7 @@ package com.example.android.brianspopularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,9 +11,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.android.brianspopularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 
@@ -39,8 +48,8 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
         String movieRating;
         String moviePlot;
         String movieURL;
+        int movieID;
         final ImageView movieImage;
-
         PosterAdapterViewHolder(View view) {
             super(view);
             movieImage = (ImageView) view.findViewById(R.id.movie_image);
@@ -55,17 +64,23 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
          */
         @Override
         public void onClick(View v) {
-            loadDetails(v, movieTitle, movieRating, movieDate, movieURL, moviePlot);
+            try {
+                new TrailerFetch().execute(this);
+            } catch (Exception e) {
+                Toast.makeText(v.getContext(), "Unable To Retrive Movie Info", Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
         }
     }
 
-    private void loadDetails(View v, String passTitle, String passRating, String passDate, String url, String plot) {
+    private void loadDetails(String passTitle, String passRating, String passDate, String url, String plot, String videoURL) {
         Intent intent = new Intent(MainActivity.getAppContext(), MovieDetails.class);
         intent.putExtra("passedTitle",passTitle);
         intent.putExtra("passedVote",passRating);
         intent.putExtra("passedDate",passDate);
         intent.putExtra("passedImage",url);
         intent.putExtra("passedPlot", plot);
+        intent.putExtra("passedVideo", videoURL);
         MainActivity.getAppContext().startActivity(intent);
     }
 
@@ -81,12 +96,13 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
 
     @Override
     public void onBindViewHolder(PosterAdapterViewHolder posterHolder, int position) {
-        mCursor.moveToPosition(position);
+
         MoviePoster loadee = movies.get(position);
         posterHolder.movieTitle = loadee.title;
         posterHolder.movieDate = loadee.releaseDate;
         posterHolder.movieRating = loadee.vote;
         posterHolder.movieURL = loadee.imageURL;
+        posterHolder.movieID = loadee.id;
         posterHolder.moviePlot = loadee.plot;
         Picasso.with(MainActivity.getAppContext()).load(baseImgUrl + loadee.imageURL).into(posterHolder.movieImage);
         // posterHolder.movieImage.setImageURI(movies.get(position).imageURL);
@@ -97,6 +113,30 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
     public int getItemCount() {
         if (movies == null) return 0;
         return movies.size();
+    }
+
+    private class TrailerFetch extends AsyncTask<PosterAdapterViewHolder, Void, Void>{
+
+
+        @Override
+        protected Void doInBackground(PosterAdapterViewHolder... params) {
+            PosterAdapterViewHolder sel = params[0];
+            int n = sel.movieID;
+            URL videoURL = NetworkUtils.getYouTubeUrl(MainActivity.getAppContext(), n);
+            JSONObject ytURL = null;
+            String vidString = null;
+            try {
+                ytURL = new JSONObject(NetworkUtils.getResponseFromHttpUrl(videoURL));
+                vidString = (String) ytURL.getJSONArray("results").getJSONObject(0).get("key");
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            loadDetails(sel.movieTitle, sel.movieRating, sel.movieDate, sel.movieURL, sel.moviePlot, vidString);
+            return null;
+        }
+
     }
 
     PosterAdapter(List<MoviePoster> movies){

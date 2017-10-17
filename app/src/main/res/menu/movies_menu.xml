@@ -1,18 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-   <!-- Sort Options for Later Use
    <item
-        android:id="@+id/refresh_movies"
-        android:title="@string/opt_refresh" />
-    <item
-        android:id="@+id/sort_movies_name_down"
-        android:title="@string/opt_sort_az" />
-    <item
-        android:id="@+id/sort_movies_name_up"
-        android:title="@string/opt_sort_za" />
-    <item
-        android:id="@+id/sort_movies_terrible"
-        android:title="@string/opt_sort_unpop" />-->
+        android:id="@+id/see_favorites"
+        android:title="@string/opt_favorites" />
     <item
         android:id="@+id/sort_movies_rating"
         android:title="@string/opt_sort_pop" />

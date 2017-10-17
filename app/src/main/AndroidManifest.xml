@@ -38,7 +38,8 @@
 
         <!-- This is required for immediate syncs -->
         <service
-            android:name=".sync.MovieSyncIntentService"
+            android:name="com.example.android.brianspopularmovies.sync.MovieSyncIntentService"
+            android:enabled="true"
             android:exported="false" />
 
         <!-- This is the Service declaration used in conjunction with FirebaseJobDispatcher -->

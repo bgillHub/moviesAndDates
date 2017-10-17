@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.example.android.brianspopularmovies.R;
+
 /**
  * Created by gilli on 9/26/2017.
  */
