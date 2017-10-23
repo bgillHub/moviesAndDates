@@ -73,7 +73,7 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
         }
     }
 
-    private void loadDetails(String passTitle, String passRating, String passDate, String url, String plot, String videoURL) {
+    private void loadDetails(String passTitle, String passRating, String passDate, String url, String plot, String videoURL, int movieId) {
         Intent intent = new Intent(MainActivity.getAppContext(), MovieDetails.class);
         intent.putExtra("passedTitle",passTitle);
         intent.putExtra("passedVote",passRating);
@@ -81,6 +81,7 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
         intent.putExtra("passedImage",url);
         intent.putExtra("passedPlot", plot);
         intent.putExtra("passedVideo", videoURL);
+        intent.putExtra("passedId", movieId);
         MainActivity.getAppContext().startActivity(intent);
     }
 
@@ -133,7 +134,7 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            loadDetails(sel.movieTitle, sel.movieRating, sel.movieDate, sel.movieURL, sel.moviePlot, vidString);
+            loadDetails(sel.movieTitle, sel.movieRating, sel.movieDate, sel.movieURL, sel.moviePlot, vidString, n);
             return null;
         }
 

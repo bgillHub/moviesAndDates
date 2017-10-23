@@ -126,7 +126,7 @@ public class SyncUtils {
                 Cursor cursor = context.getContentResolver().query(
                         movieQueryUri,
                         projectionColumns,
-                        selectionStatement,
+                        null,
                         null,
                         null);
                 /*
@@ -145,6 +145,7 @@ public class SyncUtils {
                  */
                 if (null == cursor || cursor.getCount() == 0) {
                     startImmediateSync(context);
+                    cursor.close();
                     Log.d("CURSOR","MAKIN CURSOR");
                 }
 
@@ -162,5 +163,6 @@ public class SyncUtils {
     {
         Intent intentToSyncImmediately = new Intent(context, MovieSyncIntentService.class);
         context.startService(intentToSyncImmediately);
+
     }
 }

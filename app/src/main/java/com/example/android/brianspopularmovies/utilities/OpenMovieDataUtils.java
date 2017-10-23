@@ -17,15 +17,7 @@ import java.net.HttpURLConnection;
  */
 
 public class OpenMovieDataUtils {
-    private static final String OWM_CITY = "city";
-    private static final String OWM_COORD = "coord";
 
-    /* Location coordinate */
-    private static final String OWM_LATITUDE = "lat";
-    private static final String OWM_LONGITUDE = "lon";
-
-    /* Weather information. Each day's forecast info is an element of the "list" array */
-    private static final String OWM_LIST = "list";
 
     private static final String OWM_MESSAGE_CODE = "cod";
 
@@ -69,7 +61,7 @@ public class OpenMovieDataUtils {
 
 
             ContentValues appValues = new ContentValues();
-            appValues.put(MoviesContract.MovieEntry.COLUMN_MOVIE, movieUrl);
+            appValues.put(MoviesContract.MovieEntry.COLUMN_MOVIE_TITLE, movieUrl);
 
             appContentValues[i] = appValues;
         }

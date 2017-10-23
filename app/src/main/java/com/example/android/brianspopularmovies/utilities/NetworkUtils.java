@@ -65,7 +65,22 @@ public final class NetworkUtils {
         return buildUrl(option);
     }
 
+    public static URL getSingleURL(Context context, int id){
+        QUERY_BASE = context.getResources().getString(R.string.api_query_base);
+        QUERY_KEY = context.getResources().getString(R.string.api_key);
+        String passURL = QUERY_BASE + "/" + id +"?" + QUERY_KEY;
+        Uri builtUri = Uri.parse(passURL);
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
+
     public static URL buildUrl(int movieQuery) {
+
         String passURL = QUERY_BASE;
         //ToDo: Alt case for favorites
         if( movieQuery == 1) {
@@ -73,6 +88,9 @@ public final class NetworkUtils {
         }
         else if (movieQuery == 2) {
             passURL += TOP_MOVIE_URL+QUERY_KEY;
+        }
+        else if (movieQuery == 0){
+            //ToDo: Here
         }
         Uri builtUri = Uri.parse(passURL).buildUpon()
                 .appendQueryParameter(VOTE_MINIMUM, "500")

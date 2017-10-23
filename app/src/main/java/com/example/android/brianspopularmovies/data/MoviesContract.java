@@ -21,13 +21,8 @@ public class MoviesContract {
         public static final String TABLE_NAME = "FAVORITES";
 
 
-        public static final String COLUMN_MOVIE = "movie_url";
+        public static final String COLUMN_MOVIE_TITLE = "movie_title";
         public static final String COLUMN_MOVIE_ID="movie_id";
-        public static final String COLUMN_MOVIE_RATING="movie_rating";
-        public static final String COLUMN_MOVIE_POSTER="movie_poster";
-        public static final String COLUMN_MOVIE_TRAILER="movie_trailer";
-
-
 
         /**
          * @param movieurl Normalized date in milliseconds
@@ -44,7 +39,7 @@ public class MoviesContract {
          * @return The selection part of the weather query for today onwards
          */
         public static String getSqlSelectForFavorites() {
-        return "";
+        return MovieEntry.COLUMN_MOVIE_ID;
         }
     }
 

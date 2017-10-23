@@ -2,6 +2,7 @@ package com.example.android.brianspopularmovies;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -47,9 +48,17 @@ public class MainActivity extends AppCompatActivity implements
     private int mPosition = RecyclerView.NO_POSITION;
     public static final String[] MAIN_MOVIE = {
             MoviesContract.MovieEntry.COLUMN_MOVIE_ID,
-            MoviesContract.MovieEntry.COLUMN_MOVIE,
+            MoviesContract.MovieEntry.COLUMN_MOVIE_TITLE,
     };
+    public static ArrayList<Integer> favorites;
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getSupportLoaderManager().restartLoader(ID_LOADER, null, this);
+        SyncUtils.initialize(this);
+        new MovieLoader(this, 1);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -98,16 +107,18 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data)
     {
-        mPosterAdapter.swapCursor(data);
-        if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
-        moviesArea.smoothScrollToPosition(mPosition);
-        if (data.getCount() != 0) try {
-            showMovieCards(new JSONArray());
-        } catch (JSONException e) {
-            e.printStackTrace();
+        data.moveToFirst();
+        favorites = new ArrayList();
+        try {
+            while (data.moveToNext()) {
+                favorites.add(data.getInt(0));
+            }
+        } finally {
+            data.close();
         }
+        new MovieLoader(this, 1);
+
         //ToDo: Add params for long term settings?
-        new MovieLoader(this,0);
 
     }
 
@@ -127,9 +138,13 @@ public class MainActivity extends AppCompatActivity implements
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.settings:
+                Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(settingsIntent);
             case R.id.sort_movies_rating:
               //  mLoader.CHOSEN = 1;
                 //mLoader.loadInBackground();
@@ -176,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements
     class MovieLoader extends AsyncTaskLoader{
 
         private Boolean dataIsReady;
-        int CHOSEN;
+        int CHOSEN =1;
         private  int loadOption = 1;
         MovieLoader(Context context, int param) {
             super(context);
@@ -186,8 +201,37 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         public Object loadInBackground() {
-            try {
-                URL movieRequestURL = NetworkUtils.buildUrl(CHOSEN);
+            //If favorites, multiple queries.
+            if (CHOSEN==0) {
+                try {
+                    final JSONArray movies = new JSONArray();
+                    for (int i :favorites)
+                    {
+                    URL movieRequestURL = NetworkUtils.getSingleURL(context, i);
+                    JSONObject movieJSON = new JSONObject(NetworkUtils
+                            .getResponseFromHttpUrl(movieRequestURL));
+                    movies.put(movieJSON);
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                showMovieCards(movies);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return true;
+                }
+                return true;
+            }
+
+            else{
+                try {
+                URL movieRequestURL = NetworkUtils.getUrl(context, CHOSEN);
 
                 String jsonMovies = NetworkUtils
                         .getResponseFromHttpUrl(movieRequestURL);
@@ -209,6 +253,7 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             }
             return true;
+            }
         }
         @Override
         protected void onStartLoading() {

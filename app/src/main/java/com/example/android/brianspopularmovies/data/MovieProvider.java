@@ -4,6 +4,8 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Movie;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,6 +28,7 @@ public class MovieProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         mOpenHelper = new DbHelper(getContext());
+
         return true;
     }
 
@@ -78,32 +81,58 @@ public class MovieProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
+    public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
         return null;
     }
 
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        /* Users of the delete method will expect the number of rows deleted to be returned. */
-        int numRowsDeleted;
-
-        /*
-         * If we pass null as the selection to SQLiteDatabase#delete, our entire table will be
-         * deleted. However, if we do pass null and delete all of the rows in the table, we won't
-         * know how many rows were deleted. According to the documentation for SQLiteDatabase,
-         * passing "1" for the selection will delete all rows and return the number of rows
-         * deleted, which is what the caller of this method expects.
-         */
-        if (null == selection) selection = "1";
+    public int bulkInsert(@NonNull Uri uri, @Nullable ContentValues[] values)  {
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 
         switch (sUriMatcher.match(uri)) {
 
             case CODE_MOVIES:
+                db.beginTransaction();
+                int rowsInserted = 0;
+                try {
+                    for (ContentValues value : values) {
+                        String movieTitle = value.getAsString(MoviesContract.MovieEntry.COLUMN_MOVIE_TITLE);
+                        int movieId =
+                                value.getAsInteger(MoviesContract.MovieEntry.COLUMN_MOVIE_ID);
+                        long _id = db.insert(MoviesContract.MovieEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            rowsInserted++;
+                        }
+                    }
+                } finally {
+                    db.endTransaction();
+                }
+
+                if (rowsInserted > 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+                return rowsInserted;
+
+            default:
+                return super.bulkInsert(uri, values);
+        }
+    }
+
+
+    @Override
+    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+        /* Users of the delete method will expect the number of rows deleted to be returned. */
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        int numRowsDeleted;
+        switch (sUriMatcher.match(uri)) {
+            case CODE_MOVIES:
+                db.beginTransaction();
                 numRowsDeleted = mOpenHelper.getWritableDatabase().delete(
                         MoviesContract.MovieEntry.TABLE_NAME,
-                        selection,
+                        selection+"= ?",
                         selectionArgs);
-
+                db.setTransactionSuccessful();
+                db.endTransaction();
                 break;
 
             default:

@@ -1,32 +1,57 @@
 package com.example.android.brianspopularmovies;
 
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.brianspopularmovies.R;
+import com.example.android.brianspopularmovies.data.DbHelper;
+import com.example.android.brianspopularmovies.data.MovieProvider;
+import com.example.android.brianspopularmovies.data.MoviesContract;
 import com.squareup.picasso.Picasso;
 
 public class MovieDetails extends AppCompatActivity {
+    ImageButton faveButton;
+    private  boolean globalState;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
         System.out.println("Started Details Activity");
+
         TextView movieTitle = (TextView) this.findViewById(R.id.selected_movie_title);
         TextView movieVotes = (TextView) this.findViewById(R.id.selected_movie_rating);
         TextView moviePlot = (TextView) this.findViewById(R.id.selected_movie_plot);
         TextView movieDate = (TextView) this.findViewById(R.id.selected_movie_release);
         ImageView movieImage = (ImageView) this.findViewById(R.id.selected_movie_image);
-        ImageButton faveButton = (ImageButton) this.findViewById(R.id.selected_movie_favorite);
+        faveButton = (ImageButton) this.findViewById(R.id.selected_movie_favorite);
+        globalState = false;
         ImageButton trailerPlay = (ImageButton) this.findViewById(R.id.selected_movie_trailer);
         final Intent intent = getIntent();
+        final int movieId = intent.getIntExtra("passedId", -1);
+        Cursor faves = getContentResolver().query(MoviesContract.MovieEntry.CONTENT_URI, null, null, null, null);
+        if (faves != null) {
+            faves.moveToFirst();
+        while (faves.moveToNext())
+        {
+            if (faves.getInt(0) == movieId) {
+                globalState = true;
+                stateChange(true);
+            }
+        }
+        faves.close();
+        }
         final String url = intent.getStringExtra("passedVideo");
         if ( url!= null)
         trailerPlay.setOnClickListener(new View.OnClickListener() {
@@ -43,12 +68,33 @@ public class MovieDetails extends AppCompatActivity {
                 }
             }
         );
-        String title = intent.getStringExtra("passedTitle");
+        final String title = intent.getStringExtra("passedTitle");
+        faveButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onClick(View v) {
+
+                if (!globalState){
+                    ContentValues newVal = new ContentValues();
+                    newVal.put(MoviesContract.MovieEntry.COLUMN_MOVIE_TITLE, title);
+                    newVal.put(MoviesContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
+                    int s = getContentResolver().bulkInsert(MoviesContract.MovieEntry.CONTENT_URI, new ContentValues[]{newVal});
+                    stateChange(true);
+                }
+                else {
+                    //ToDo Remove form the db
+                    ContentValues newVal = new ContentValues();
+                    newVal.put(MoviesContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
+                    int s = getContentResolver().delete(MoviesContract.MovieEntry.CONTENT_URI, MoviesContract.MovieEntry.COLUMN_MOVIE_ID,  new String[]{String.valueOf(movieId)});
+                    stateChange(false);
+                }
+                System.out.println("Passed");
+            }
+        });
         String vote = intent.getStringExtra("passedVote");
         String plot = intent.getStringExtra("passedPlot");
         String date = intent.getStringExtra("passedDate");
         String image = intent.getStringExtra("passedImage");
-        String video = intent.getStringExtra("passedVideo");
         if (title != null)
         {
             movieTitle.setText(title);
@@ -72,6 +118,16 @@ public class MovieDetails extends AppCompatActivity {
             System.out.println("Image Found");
         }
         else System.out.println("No Image Found for Activity");
+    }
+
+    private void stateChange(boolean state) {
+        if (state)
+        {
+        faveButton.setImageResource(android.R.drawable.btn_star_big_on);
+        }
+        else {faveButton.setImageResource(android.R.drawable.btn_star_big_off);
+        }
+        globalState = state;
     }
 
 }

@@ -70,22 +70,28 @@
                     android:layout_height="75dp"
                     android:layout_centerVertical="true"
                     android:id="@+id/selected_movie_favorite"
-                    android:src="@android:drawable/btn_star_big_on"
-                    android:background="@color/cardview_light_background"
+                    android:background="@drawable/star"
+                    android:text="@string/favorite"
+                    android:textColorHighlight="@color/cardview_light_background"
+                    android:gravity="bottom|center"
+                    android:textSize="12sp"
+                    android:layout_marginLeft="30dp"
                     android:padding="10dp"
                     android:layout_alignParentLeft="true"
-                    android:tooltipText="Remove From Favorites"
                     android:contentDescription="@string/favorite_description" />
                 <ImageButton
                     android:layout_width="75dp"
                     android:layout_height="75dp"
                     android:id="@+id/selected_movie_trailer"
-                    android:src="@android:drawable/ic_media_play"
                     android:layout_centerVertical="true"
+                    android:layout_marginRight="30dp"
                     android:layout_alignParentRight="true"
-                    android:background="@color/colorPrimary"
+                    android:textColorHighlight="@color/cardview_light_background"
+                    android:background="@android:drawable/ic_media_play"
                     android:padding="10dp"
-                    android:tooltipText="Play Trailer"
-                    android:contentDescription="@string/favorite_description" />
+                    android:textSize="12sp"
+                    android:text="@string/play_trailer"
+                    android:gravity="bottom|center"
+                    android:contentDescription="@string/launches_youttube_video" />
         </RelativeLayout>
 </RelativeLayout>

@@ -9,4 +9,7 @@
     <item
         android:id="@+id/sort_movies_votes"
         android:title="@string/opt_sort_count" />
+    <item
+        android:id="@+id/settings"
+        android:title="@string/settings_title" />
 </menu>
