@@ -1,25 +1,20 @@
 package com.example.android.brianspopularmovies;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.android.brianspopularmovies.data.MoviesContract;
@@ -39,13 +34,10 @@ import static android.R.attr.data;
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor>
 {
-
     private static Context context;
-    private ProgressBar loadingSpinner;
-    private static RecyclerView moviesArea;
+    private  RecyclerView moviesArea;
     private static final int ID_LOADER = 44;
     private static PosterAdapter mPosterAdapter;
-    private int mPosition = RecyclerView.NO_POSITION;
     public static final String[] MAIN_MOVIE = {
             MoviesContract.MovieEntry.COLUMN_MOVIE_ID,
             MoviesContract.MovieEntry.COLUMN_MOVIE_TITLE,
@@ -67,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         getSupportActionBar().setElevation(0f);
         mPosterAdapter = new PosterAdapter(null);
-        loadingSpinner = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         moviesArea = (RecyclerView) findViewById(R.id.recyclerview_movies);
         moviesArea.setAdapter(mPosterAdapter);
         moviesArea.setHasFixedSize(true);
@@ -81,24 +72,15 @@ public class MainActivity extends AppCompatActivity implements
         switch (id) {
 
             case ID_LOADER:
-                /* URI for all rows of weather data in our weather table */
                 Uri mQueryUri = MoviesContract.MovieEntry.CONTENT_URI;
-                /* Sort order: Ascending by date */
                 String sortOrder = MoviesContract.MovieEntry.COLUMN_MOVIE_ID + " ASC";
-                /*
-                 * A SELECTION in SQL declares which rows you'd like to return. In our case, we
-                 * want all weather data from today onwards that is stored in our weather table.
-                 * We created a handy method to do that in our WeatherEntry class.
-                 */
                 String selection = MoviesContract.MovieEntry.getSqlSelectForFavorites();
-
                 return new CursorLoader(this,
                         mQueryUri,
                         MAIN_MOVIE,
                         selection,
                         null,
                         sortOrder);
-
             default:
                 throw new RuntimeException("Loader Not Implemented: " + id);
         }
@@ -108,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onLoadFinished(Loader<Cursor> loader, Cursor data)
     {
         data.moveToFirst();
-        favorites = new ArrayList();
+        favorites = new ArrayList<>();
         try {
             while (data.moveToNext()) {
                 favorites.add(data.getInt(0));
@@ -127,17 +109,12 @@ public class MainActivity extends AppCompatActivity implements
         mPosterAdapter.swapCursor(null);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        /* Use AppCompatActivity's method getMenuInflater to get a handle on the menu inflater */
         MenuInflater inflater = getMenuInflater();
-        /* Use the inflater's inflate method to inflate our menu layout to this menu */
         inflater.inflate(R.menu.movies_menu, menu);
-        /* Return true so that the menu is displayed in the Toolbar */
         return true;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -146,18 +123,12 @@ public class MainActivity extends AppCompatActivity implements
                 Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(settingsIntent);
             case R.id.sort_movies_rating:
-              //  mLoader.CHOSEN = 1;
-                //mLoader.loadInBackground();
                 new MovieLoader(this,1);
                 return true;
             case R.id.sort_movies_votes:
-              //  mLoader.CHOSEN = 2;
-              //  mLoader.loadInBackground();
                 new MovieLoader(this,2);
                 return true;
             default:
-              //  ToDo: Load up the favorites
-              //  mLoader.loadInBackground();
                 new MovieLoader(this,0);
                 return true;
         }
@@ -165,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements
     private void showErrorMessage(){
         Toast.makeText(this, "There Was An Error!", Toast.LENGTH_LONG).show();
     }
-    private static void showMovieCards(JSONArray movieData) throws JSONException {
+    private void showMovieCards(JSONArray movieData) throws JSONException {
         ArrayList<MoviePoster> movies = new ArrayList<>();
         System.out.println("Showing cards!");
         for (int i = 0; i < movieData.length(); i++){
@@ -188,11 +159,10 @@ public class MainActivity extends AppCompatActivity implements
         return context;
     }
 
-    class MovieLoader extends AsyncTaskLoader{
+    private class MovieLoader extends AsyncTaskLoader{
 
         private Boolean dataIsReady;
         int CHOSEN =1;
-        private  int loadOption = 1;
         MovieLoader(Context context, int param) {
             super(context);
             CHOSEN = param;
@@ -201,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         public Object loadInBackground() {
-            //If favorites, multiple queries.
             if (CHOSEN==0) {
                 try {
                     final JSONArray movies = new JSONArray();
@@ -228,14 +197,12 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 return true;
             }
-
             else{
                 try {
                 URL movieRequestURL = NetworkUtils.getUrl(context, CHOSEN);
 
                 String jsonMovies = NetworkUtils
                         .getResponseFromHttpUrl(movieRequestURL);
-
                 final JSONArray m = OpenMovieDataUtils
                         .getMoviePagesNew(context, jsonMovies);
                 runOnUiThread(new Runnable() {
@@ -263,7 +230,6 @@ public class MainActivity extends AppCompatActivity implements
                 forceLoad();
             }
         }
-
         @Override
         protected void onStopLoading() {
             cancelLoad();

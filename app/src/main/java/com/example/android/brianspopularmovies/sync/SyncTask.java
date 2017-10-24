@@ -17,21 +17,16 @@ import java.net.URL;
  * Created by gilli on 9/26/2017.
  */
 
-public class SyncTask {
-    synchronized public static void syncFavorites(Context context) {
+class SyncTask {
+    synchronized static void syncFavorites(Context context) {
 
         try {
-                ContentResolver mContentResolver = context.getContentResolver();
-
-                /* Delete old weather data because we don't need to keep multiple days' data */
-                mContentResolver.delete(
+             ContentResolver mContentResolver = context.getContentResolver();
+             mContentResolver.delete(
                         MoviesContract.MovieEntry.CONTENT_URI,
                         null,
                         null);
-
-
         } catch (Exception e) {
-            /* Server probably invalid */
             e.printStackTrace();
         }
     }

@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.brianspopularmovies.utilities.NetworkUtils;
@@ -21,7 +20,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -34,15 +35,11 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
 
     private final List<MoviePoster> movies;
     private final String baseImgUrl = "http://image.tmdb.org/t/p/w185/";
-    private Cursor mCursor;
 
     public void swapCursor(Cursor data) {
-        mCursor = data;
         notifyDataSetChanged();
     }
-
     class PosterAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
         String movieTitle;
         String movieDate;
         String movieRating;
@@ -52,28 +49,20 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
         final ImageView movieImage;
         PosterAdapterViewHolder(View view) {
             super(view);
-            movieImage = (ImageView) view.findViewById(R.id.movie_image);
-            //ToDo: Onclick, go to moviedetails activity with the poster as an extra
+            movieImage = view.findViewById(R.id.movie_image);
             view.setOnClickListener(this);
         }
-
-        /**
-         * This gets called by the child views during a click.
-         *
-         * @param v The View that was clicked
-         */
         @Override
         public void onClick(View v) {
             try {
-                new TrailerFetch().execute(this);
+                new ContentFetch().execute(this);
             } catch (Exception e) {
-                Toast.makeText(v.getContext(), "Unable To Retrive Movie Info", Toast.LENGTH_LONG).show();
+                Toast.makeText(v.getContext(), "Unable To Retrieve Movie Info", Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
         }
     }
-
-    private void loadDetails(String passTitle, String passRating, String passDate, String url, String plot, String videoURL, int movieId) {
+    private void loadDetails(String passTitle, String passRating, String passDate, String url, String plot, String videoURL, int movieId, ArrayList reviews) {
         Intent intent = new Intent(MainActivity.getAppContext(), MovieDetails.class);
         intent.putExtra("passedTitle",passTitle);
         intent.putExtra("passedVote",passRating);
@@ -82,22 +71,19 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
         intent.putExtra("passedPlot", plot);
         intent.putExtra("passedVideo", videoURL);
         intent.putExtra("passedId", movieId);
+        intent.putExtra("passedReviews", reviews);
         MainActivity.getAppContext().startActivity(intent);
     }
-
     @Override
     public PosterAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         int layoutIdForListItem = R.layout.movie_card;
         LayoutInflater inflater = LayoutInflater.from(context);
-        boolean shouldAttachToParentImmediately = false;
         CardView view = (CardView) inflater.inflate(layoutIdForListItem, parent, false);
         return new PosterAdapterViewHolder(view);
     }
-
     @Override
     public void onBindViewHolder(PosterAdapterViewHolder posterHolder, int position) {
-
         MoviePoster loadee = movies.get(position);
         posterHolder.movieTitle = loadee.title;
         posterHolder.movieDate = loadee.releaseDate;
@@ -106,40 +92,39 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
         posterHolder.movieID = loadee.id;
         posterHolder.moviePlot = loadee.plot;
         Picasso.with(MainActivity.getAppContext()).load(baseImgUrl + loadee.imageURL).into(posterHolder.movieImage);
-        // posterHolder.movieImage.setImageURI(movies.get(position).imageURL);
     }
-
-
     @Override
     public int getItemCount() {
         if (movies == null) return 0;
         return movies.size();
     }
-
-    private class TrailerFetch extends AsyncTask<PosterAdapterViewHolder, Void, Void>{
-
-
+    private class ContentFetch extends AsyncTask<PosterAdapterViewHolder, Void, Void>{
         @Override
         protected Void doInBackground(PosterAdapterViewHolder... params) {
             PosterAdapterViewHolder sel = params[0];
             int n = sel.movieID;
             URL videoURL = NetworkUtils.getYouTubeUrl(MainActivity.getAppContext(), n);
+            URL reviewURL = NetworkUtils.getReviewsUrl(MainActivity.getAppContext(), n);
             JSONObject ytURL = null;
+            ArrayList<String> reviews = new ArrayList<>();
             String vidString = null;
             try {
                 ytURL = new JSONObject(NetworkUtils.getResponseFromHttpUrl(videoURL));
+                JSONObject revRes = new JSONObject(NetworkUtils.getResponseFromHttpUrl(reviewURL));
+                JSONArray results = revRes.getJSONArray("results");
+                for ( int i=0; i < results.length(); i ++)
+                {
+                    JSONObject rev = results.getJSONObject(i);
+                    reviews.add(rev.getString("content"));
+                }
                 vidString = (String) ytURL.getJSONArray("results").getJSONObject(0).get("key");
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
+            } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
-            loadDetails(sel.movieTitle, sel.movieRating, sel.movieDate, sel.movieURL, sel.moviePlot, vidString, n);
+            loadDetails(sel.movieTitle, sel.movieRating, sel.movieDate, sel.movieURL, sel.moviePlot, vidString, n, reviews);
             return null;
         }
-
     }
-
     PosterAdapter(List<MoviePoster> movies){
         this.movies = movies;
     }

@@ -24,25 +24,19 @@
             android:label="@string/title_activity_movie_details"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <!-- The manifest entry for our SettingsActivity. Each Activity requires a manifest entry -->
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <!-- Our ContentProvider -->
         <provider
             android:name=".data.MovieProvider"
             android:authorities="@string/content_authority"
             android:exported="false" />
-
-        <!-- This is required for immediate syncs -->
         <service
             android:name="com.example.android.brianspopularmovies.sync.MovieSyncIntentService"
             android:enabled="true"
             android:exported="false" />
-
-        <!-- This is the Service declaration used in conjunction with FirebaseJobDispatcher -->
         <service
             android:name=".sync.MovieFirebaseJobService"
             android:exported="false">
@@ -51,5 +45,4 @@
             </intent-filter>
         </service>
     </application>
-
 </manifest>

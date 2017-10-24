@@ -150,4 +150,25 @@ public final class NetworkUtils {
         }
         return url;
     }
+
+    public static URL getReviewsUrl(Context context, int id) {
+        QUERY_BASE = context.getResources().getString(R.string.api_query_base);
+        QUERY_KEY = context.getResources().getString(R.string.api_key);
+        return buildReviewUrl(id);
+    }
+
+    public static URL buildReviewUrl(int movieID) {
+        String passURL = QUERY_BASE;
+        //ToDo: Alt case for favorites
+        passURL += ("/".concat(String.valueOf(movieID)).concat("/reviews?").concat(QUERY_KEY));
+        Uri builtUri = Uri.parse(passURL).buildUpon()
+                .build();
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
 }

@@ -4,8 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import static android.content.Context.MODE_PRIVATE;
-
 /**
  * Created by gilli on 9/26/2017.
  */
