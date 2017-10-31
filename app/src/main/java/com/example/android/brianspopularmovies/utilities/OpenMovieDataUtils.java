@@ -16,9 +16,9 @@ import java.net.HttpURLConnection;
  * Created by gilli on 8/15/2017.
  */
 
-public class OpenMovieDataUtils {
+public final class OpenMovieDataUtils {
 
-
+    private  OpenMovieDataUtils(){}
     private static final String OWM_MESSAGE_CODE = "cod";
 
     //ToDo: this method collects the previous favorites!!

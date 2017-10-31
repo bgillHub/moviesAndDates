@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_gravity="center"
-    tools:context="com.example.android.brianspopularmovies.MovieDetails"
+    tools:context="com.example.android.brianspopularmovies.MovieDetailsActivity"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:padding="15dp"

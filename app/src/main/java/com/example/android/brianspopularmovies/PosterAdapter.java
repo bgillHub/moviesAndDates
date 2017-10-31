@@ -20,7 +20,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +62,7 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
         }
     }
     private void loadDetails(String passTitle, String passRating, String passDate, String url, String plot, String videoURL, int movieId, ArrayList reviews) {
-        Intent intent = new Intent(MainActivity.getAppContext(), MovieDetails.class);
+        Intent intent = new Intent(MainActivity.getAppContext(), MovieDetailsActivity.class);
         intent.putExtra("passedTitle",passTitle);
         intent.putExtra("passedVote",passRating);
         intent.putExtra("passedDate",passDate);

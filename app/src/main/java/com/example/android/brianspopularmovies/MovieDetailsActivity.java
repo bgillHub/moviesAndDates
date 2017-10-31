@@ -20,7 +20,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class MovieDetails extends AppCompatActivity {
+public class MovieDetailsActivity extends AppCompatActivity {
     ImageButton faveButton;
     private  boolean globalState;
     @Override
@@ -99,7 +99,7 @@ public class MovieDetails extends AppCompatActivity {
                     reviewString+= "'"+movieReviews.get(i)+"'" + "\n\n";
                 }
                 if (movieReviews.size() ==0) reviewString = getString(R.string.no_reviews);
-                AlertDialog.Builder builder = new AlertDialog.Builder(MovieDetails.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MovieDetailsActivity.this);
                 builder.setMessage(reviewString)
                         .setTitle(getString(R.string.reviews_title));
                 AlertDialog dialog = builder.create();

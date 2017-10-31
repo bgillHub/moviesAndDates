@@ -67,18 +67,13 @@ public class MovieProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         switch (sUriMatcher.match(uri)) {
             case CODE_MOVIES:
-                db.beginTransaction();
                 int rowsInserted = 0;
-                try {
                     for (ContentValues value : values) {
                         long _id = db.insert(MoviesContract.MovieEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
                             rowsInserted++;
                         }
                     }
-                } finally {
-                    db.endTransaction();
-                }
 
                 if (rowsInserted > 0) {
                     getContext().getContentResolver().notifyChange(uri, null);

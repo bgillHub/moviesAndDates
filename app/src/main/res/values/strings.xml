@@ -12,20 +12,20 @@
     <string name="opt_sort_count">Top Rated Movies</string>
     <string name="pref_enable_notifications_key">true</string>
     <string name="title_activity_settings">SettingsActivity</string>
-    <string name="content_authority">com.example.android.brianspopularmovies</string>
-    <string name="api_query_base">https://api.themoviedb.org/3/movie</string>
-    <string name="query_top">/top_rated?</string>
-    <string name="query_pop">/popular?</string>
+    <string name="content_authority" translatable="false">com.example.android.brianspopularmovies</string>
+    <string name="api_query_base" translatable="false">https://api.themoviedb.org/3/movie</string>
+    <string name="query_top" translatable="false">/top_rated?</string>
+    <string name="query_pop" translatable="false">/popular?</string>
     //ToDo:Replace API key!!!
-    <string name="api_key">api_key=</string>
+    <string name="api_key" translatable="false">api_key=</string>
     <string name="favorite_description">A Favorite Button</string>
-    <string name="api_yt_query_base">\??</string>
+    <string name="api_yt_query_base" translatable="false">\??</string>
     <string name="settings_title">App Settings</string>
     <string name="pref_last_notification">LAST_NOTIFY</string>
     <string name="favorite">fav_but_txt</string>
     <string name="play_trailer">play_vid_txt</string>
     <string name="launches_youttube_video">Launches YoutTube Video</string>
     <string name="displays_user_reviews">Displays User Reviews</string>
-    <string name="no_reviews">No Reviews Appear to Have Been Found...</string>
+    <string name="no_reviews">No Reviews Appear to Have Been Found…</string>
     <string name="reviews_title">Other Users\' Reviews</string>
 </resources>
