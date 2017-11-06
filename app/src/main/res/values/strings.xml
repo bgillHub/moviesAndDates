@@ -28,4 +28,9 @@
     <string name="displays_user_reviews">Displays User Reviews</string>
     <string name="no_reviews">No Reviews Appear to Have Been Found…</string>
     <string name="reviews_title">Other Users\' Reviews</string>
+    <string name="scroll_key">SCROLL</string>
+    <string name="search_type">SEARCH_TYPE</string>
+    <string name="open_details">open_details</string>
+    <string name="rating_append">/ 10</string>
+    <string name="review_string">reviews</string>
 </resources>

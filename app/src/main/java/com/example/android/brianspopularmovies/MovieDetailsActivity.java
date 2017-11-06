@@ -21,13 +21,19 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 public class MovieDetailsActivity extends AppCompatActivity {
+    private static String REVIEW_STRING;
     ImageButton faveButton;
     private  boolean globalState;
+    private static String OPEN_DETAILS;
+    private String reviewString = "";
+    private AlertDialog detailsDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
         System.out.println("Started Details Activity");
+        OPEN_DETAILS = getString(R.string.open_details);
+        REVIEW_STRING = getString(R.string.review_string);
         TextView movieTitle = (TextView) this.findViewById(R.id.selected_movie_title);
         TextView movieVotes = (TextView) this.findViewById(R.id.selected_movie_rating);
         TextView moviePlot = (TextView) this.findViewById(R.id.selected_movie_plot);
@@ -93,7 +99,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         reviewPop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String reviewString = "";
+                reviewString = "";
                 for (int i = 0; i < movieReviews.size(); i++)
                 {
                     reviewString+= "'"+movieReviews.get(i)+"'" + "\n\n";
@@ -102,8 +108,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MovieDetailsActivity.this);
                 builder.setMessage(reviewString)
                         .setTitle(getString(R.string.reviews_title));
-                AlertDialog dialog = builder.create();
-                dialog.show();
+                detailsDialog = builder.create();
+                detailsDialog.show();
             }
         });
         String vote = intent.getStringExtra("passedVote");
@@ -116,7 +122,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
         }
         if (vote != null)
         {
-            movieVotes.setText(vote);
+            String voteString = vote + getString(R.string.rating_append);
+            movieVotes.setText(voteString);
         }
         if (plot != null)
         {
@@ -144,4 +151,28 @@ public class MovieDetailsActivity extends AppCompatActivity {
         globalState = state;
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (detailsDialog!= null)
+        {
+            outState.putBoolean(OPEN_DETAILS,detailsDialog.isShowing());
+            outState.putString(REVIEW_STRING,reviewString);
+            detailsDialog.dismiss();
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        if (savedInstanceState.getBoolean(OPEN_DETAILS)){
+            reviewString = savedInstanceState.getString(REVIEW_STRING);
+            AlertDialog.Builder builder = new AlertDialog.Builder(MovieDetailsActivity.this);
+            builder.setMessage(reviewString)
+                    .setTitle(getString(R.string.reviews_title));
+            detailsDialog = builder.create();
+            detailsDialog.show();
+            detailsDialog.show();
+        }
+        super.onRestoreInstanceState(savedInstanceState);
+    }
 }

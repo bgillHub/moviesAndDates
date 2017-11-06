@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_gravity="center"
+    tools:context="com.example.android.brianspopularmovies.MovieDetailsActivity"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="15dp"
+    android:layout_centerVertical="true"
+    android:gravity="center">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:id="@+id/header"
+        android:orientation="horizontal">
+        <TextView android:id="@+id/selected_movie_rating"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textSize="20sp"
+            android:layout_marginLeft="25dp"
+            android:textStyle="bold"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="2dp"
+            android:textAlignment="center"
+            />
+        <TextView android:id="@+id/selected_movie_title"
+            android:layout_margin="2dp"
+            android:textAlignment="center"
+            android:textSize="28sp"
+            android:layout_centerHorizontal="true"
+            android:textStyle="bold"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            />
+        <TextView
+            android:id="@+id/selected_movie_release"
+            android:layout_width="wrap_content"
+            android:textAlignment="center"
+            android:layout_marginRight="25dp"
+            android:textSize="15sp"
+            android:layout_alignParentRight="true"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+    <ImageView
+        android:layout_width="125dp"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="1dp"
+        android:contentDescription="@string/poster_desc"
+        android:layout_below="@id/header"
+        android:layout_height="200dp"
+        android:id="@+id/selected_movie_image"/>
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="55dp"
+        android:id="@+id/selected_movie_scroll"
+        android:layout_below="@id/selected_movie_image"
+        android:layout_centerHorizontal="true">
+        <TextView android:id="@+id/selected_movie_plot"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textAlignment="center"
+            android:textSize="15sp"
+            android:textStyle="italic"
+            android:layout_margin="2dp" />
+    </ScrollView>
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:padding="2dp"
+        android:layout_height="wrap_content">
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:id="@+id/selected_movie_favorite"
+            android:background="@drawable/star"
+            android:text="@string/favorite"
+            android:textColorHighlight="@color/cardview_light_background"
+            android:gravity="bottom|center"
+            android:textSize="12sp"
+            android:layout_marginRight="50dp"
+            android:padding="10dp"
+            android:contentDescription="@string/favorite_description" />
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:id="@+id/selected_movie_reviews"
+            android:background="@android:drawable/ic_menu_help"
+            android:text="@string/favorite"
+            android:textColorHighlight="@color/cardview_light_background"
+            android:gravity="bottom|center"
+            android:textSize="12sp"
+            android:padding="10dp"
+            android:contentDescription="@string/displays_user_reviews" />
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:id="@+id/selected_movie_trailer"
+            android:layout_marginLeft="50dp"
+            android:textColorHighlight="@color/cardview_light_background"
+            android:background="@android:drawable/ic_media_play"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:text="@string/play_trailer"
+            android:gravity="bottom|center"
+            android:contentDescription="@string/launches_youttube_video" />
+    </LinearLayout>
+</RelativeLayout>

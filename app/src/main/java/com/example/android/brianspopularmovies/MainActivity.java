@@ -4,13 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,7 +37,13 @@ import static android.R.attr.data;
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor>
 {
+    private static  String SEARCH_TYPE;
+    private static String   SCROLL_POS;
+    private  int search = 1;
     private static Context context;
+    private int scroll;
+    private int loadType;
+    private boolean restart = false;
     private  RecyclerView moviesArea;
     private static final int ID_LOADER = 44;
     private static PosterAdapter mPosterAdapter;
@@ -49,13 +58,15 @@ public class MainActivity extends AppCompatActivity implements
         super.onResume();
         getSupportLoaderManager().restartLoader(ID_LOADER, null, this);
         SyncUtils.initialize(this);
-        new MovieLoader(this, 1);
+       // new MovieLoader(this, 1);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         context = getApplicationContext();
+        SCROLL_POS = getString(R.string.scroll_key);
+        SEARCH_TYPE = getString(R.string.search_type);
         setContentView(R.layout.activity_main);
         getSupportActionBar().setElevation(0f);
         mPosterAdapter = new PosterAdapter(null);
@@ -63,8 +74,8 @@ public class MainActivity extends AppCompatActivity implements
         moviesArea.setAdapter(mPosterAdapter);
         moviesArea.setHasFixedSize(true);
         moviesArea.setLayoutManager(new GridLayoutManager(this, 3));
-        getSupportLoaderManager().initLoader(ID_LOADER, null, this);
-        SyncUtils.initialize(this);
+      //  getSupportLoaderManager().initLoader(ID_LOADER, null, this);
+        //SyncUtils.initialize(this);
     }
 
     @Override
@@ -89,17 +100,18 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data)
     {
-        data.moveToFirst();
-        favorites = new ArrayList<>();
-        try {
-            while (data.moveToNext()) {
-                favorites.add(data.getInt(0));
+        if (!data.isClosed()) {
+            data.moveToFirst();
+            favorites = new ArrayList<>();
+            try {
+                while (data.moveToNext()) {
+                    favorites.add(data.getInt(0));
+                }
+            } finally {
+                data.close();
             }
-        } finally {
-            data.close();
+            new MovieLoader(this, search);
         }
-        new MovieLoader(this, 1);
-
         //ToDo: Add params for long term settings?
 
     }
@@ -116,31 +128,52 @@ public class MainActivity extends AppCompatActivity implements
         return true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        int i = ((LinearLayoutManager)moviesArea.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+        if (i <= 0){
+            i = 0;
+        }
+        outState.putInt(SCROLL_POS, i);
+        outState.putInt(SEARCH_TYPE, search);
         super.onSaveInstanceState(outState);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        scroll = savedInstanceState.getInt(SCROLL_POS);
+        search = savedInstanceState.getInt(SEARCH_TYPE);
+        restart = true;
+        super.onRestoreInstanceState(savedInstanceState);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        scroll = 0;
         switch (item.getItemId()) {
             case R.id.settings:
                 Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(settingsIntent);
             case R.id.sort_movies_rating:
-                new MovieLoader(this,1);
+                search = 1;
+                new MovieLoader(this,search);
                 return true;
             case R.id.sort_movies_votes:
-                new MovieLoader(this,2);
+                search = 2;
+                new MovieLoader(this,search);
                 return true;
             default:
-                new MovieLoader(this,0);
+                search = 0;
+                new MovieLoader(this,search);
                 return true;
         }
     }
     private void showErrorMessage(){
         Toast.makeText(this, "There Was An Error!", Toast.LENGTH_LONG).show();
     }
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     private void showMovieCards(JSONArray movieData) throws JSONException {
         ArrayList<MoviePoster> movies = new ArrayList<>();
         System.out.println("Showing cards!");
@@ -157,6 +190,9 @@ public class MainActivity extends AppCompatActivity implements
         }
         mPosterAdapter = new PosterAdapter(movies);
         moviesArea.setAdapter(mPosterAdapter);
+        if (restart){
+            moviesArea.scrollToPosition(scroll);
+        }
         Toast.makeText(getAppContext(), "Search Complete", Toast.LENGTH_LONG).show();
     }
 
@@ -187,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements
                     movies.put(movieJSON);
                     }
                     runOnUiThread(new Runnable() {
+                        @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
                         @Override
                         public void run() {
                             try {
@@ -211,6 +248,7 @@ public class MainActivity extends AppCompatActivity implements
                 final JSONArray m = OpenMovieDataUtils
                         .getMoviePagesNew(context, jsonMovies);
                 runOnUiThread(new Runnable() {
+                    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
                     @Override
                     public void run() {
                         try {
@@ -235,11 +273,13 @@ public class MainActivity extends AppCompatActivity implements
                 forceLoad();
             }
         }
+
         @Override
         protected void onStopLoading() {
             cancelLoad();
             dataIsReady = true;
         }
+
     }
 
 }
