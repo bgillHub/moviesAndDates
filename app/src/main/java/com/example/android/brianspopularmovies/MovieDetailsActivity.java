@@ -1,15 +1,14 @@
 package com.example.android.brianspopularmovies;
 
-import android.content.ActivityNotFoundException;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -21,10 +20,13 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 public class MovieDetailsActivity extends AppCompatActivity {
+    private static String OPEN_TRAILERS;
     private static String REVIEW_STRING;
     ImageButton faveButton;
     private  boolean globalState;
     private static String OPEN_DETAILS;
+    private ImageButton trailerPlay;
+    private Dialog trailerDialog;
     private String reviewString = "";
     private AlertDialog detailsDialog;
     @Override
@@ -33,6 +35,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movie_details);
         System.out.println("Started Details Activity");
         OPEN_DETAILS = getString(R.string.open_details);
+        OPEN_TRAILERS = getString(R.string.open_trailers);
         REVIEW_STRING = getString(R.string.review_string);
         TextView movieTitle = (TextView) this.findViewById(R.id.selected_movie_title);
         TextView movieVotes = (TextView) this.findViewById(R.id.selected_movie_rating);
@@ -41,7 +44,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         ImageView movieImage = (ImageView) this.findViewById(R.id.selected_movie_image);
         faveButton = (ImageButton) this.findViewById(R.id.selected_movie_favorite);
         globalState = false;
-        ImageButton trailerPlay = (ImageButton) this.findViewById(R.id.selected_movie_trailer);
+        trailerPlay = (ImageButton) this.findViewById(R.id.selected_movie_trailer);
         ImageButton reviewPop = (ImageButton) this.findViewById(R.id.selected_movie_reviews);
         final Intent intent = getIntent();
         final int movieId = intent.getIntExtra("passedId", -1);
@@ -58,25 +61,36 @@ public class MovieDetailsActivity extends AppCompatActivity {
         }
         faves.close();
         }
-        final String url = intent.getStringExtra("passedVideo");
-        if ( url!= null)
+        final ArrayList<String> urls = intent.getStringArrayListExtra("passedVideoKey");
+        final ArrayList<String> titles = intent.getStringArrayListExtra("passedVideoTitle");
+        if ( urls!= null)
         trailerPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + url));
-                    Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                            Uri.parse("http://www.youtube.com/watch?v=" + url));
-                    try {
-                        v.getContext().startActivity(appIntent);
-                    } catch (ActivityNotFoundException ex) {
-                        v.getContext().startActivity(webIntent);
-                    }
+                trailerDialog = new Dialog(MovieDetailsActivity.this);
+                if (titles.size() <= 0)
+                {
+                    trailerDialog.setTitle(R.string.no_trailers);
+                }
+                else{
+                ArrayList<VideoCard> mTrailers = new ArrayList();
+                for (int i = 0; i < titles.size(); i ++){
+                    mTrailers.add(new VideoCard( titles.get(i), urls.get(i)));
+                }
+                TrailerAdapter dialogAdapter = new TrailerAdapter(mTrailers);
+                trailerDialog.setContentView(R.layout.trailer_dialog);
+                RecyclerView mRecycle = (RecyclerView) trailerDialog.findViewById(R.id.trailer_list);
+                mRecycle.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                mRecycle.setAdapter(dialogAdapter);
+                int i = dialogAdapter.getItemCount();
+                dialogAdapter.notifyDataSetChanged();
+                }
+                trailerDialog.show();
                 }
             }
         );
         final String title = intent.getStringExtra("passedTitle");
         faveButton.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
                 if (!globalState){
@@ -87,7 +101,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
                     stateChange(true);
                 }
                 else {
-                    //ToDo Remove form the db
                     ContentValues newVal = new ContentValues();
                     newVal.put(MoviesContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
                     int s = getContentResolver().delete(MoviesContract.MovieEntry.CONTENT_URI, MoviesContract.MovieEntry.COLUMN_MOVIE_ID,  new String[]{String.valueOf(movieId)});
@@ -153,11 +166,17 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        if (detailsDialog!= null)
+        if (detailsDialog != null)
         {
             outState.putBoolean(OPEN_DETAILS,detailsDialog.isShowing());
             outState.putString(REVIEW_STRING,reviewString);
             detailsDialog.dismiss();
+
+        }
+        else if (trailerDialog != null)
+        {
+            outState.putBoolean(OPEN_TRAILERS, trailerDialog.isShowing());
+            trailerDialog.dismiss();
         }
         super.onSaveInstanceState(outState);
     }
@@ -172,6 +191,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
             detailsDialog = builder.create();
             detailsDialog.show();
             detailsDialog.show();
+        }
+        else if (savedInstanceState.getBoolean(OPEN_TRAILERS))
+        {
+        trailerPlay.performClick();
         }
         super.onRestoreInstanceState(savedInstanceState);
     }

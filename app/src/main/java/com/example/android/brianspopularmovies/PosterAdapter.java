@@ -61,14 +61,15 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
             }
         }
     }
-    private void loadDetails(String passTitle, String passRating, String passDate, String url, String plot, String videoURL, int movieId, ArrayList reviews) {
+    private void loadDetails(String passTitle, String passRating, String passDate, String url, String plot, ArrayList videoURL, ArrayList videoTitles, int movieId, ArrayList reviews) {
         Intent intent = new Intent(MainActivity.getAppContext(), MovieDetailsActivity.class);
         intent.putExtra("passedTitle",passTitle);
         intent.putExtra("passedVote",passRating);
         intent.putExtra("passedDate",passDate);
         intent.putExtra("passedImage",url);
         intent.putExtra("passedPlot", plot);
-        intent.putExtra("passedVideo", videoURL);
+        intent.putExtra("passedVideoKey", videoURL);
+        intent.putExtra("passedVideoTitle", videoTitles);
         intent.putExtra("passedId", movieId);
         intent.putExtra("passedReviews", reviews);
         MainActivity.getAppContext().startActivity(intent);
@@ -106,7 +107,8 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
             URL reviewURL = NetworkUtils.getReviewsUrl(MainActivity.getAppContext(), n);
             JSONObject ytURL = null;
             ArrayList<String> reviews = new ArrayList<>();
-            String vidString = null;
+            ArrayList<String> videoKeys = new ArrayList<>();
+            ArrayList<String> videoTitles = new ArrayList<>();
             try {
                 ytURL = new JSONObject(NetworkUtils.getResponseFromHttpUrl(videoURL));
                 JSONObject revRes = new JSONObject(NetworkUtils.getResponseFromHttpUrl(reviewURL));
@@ -116,11 +118,17 @@ class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterAdapterView
                     JSONObject rev = results.getJSONObject(i);
                     reviews.add(rev.getString("content"));
                 }
-                vidString = (String) ytURL.getJSONArray("results").getJSONObject(0).get("key");
+                results = ytURL.getJSONArray("results");
+                for ( int i=0; i < results.length(); i ++)
+                {
+                    JSONObject rev = results.getJSONObject(i);
+                    videoKeys.add(rev.getString("key"));
+                    videoTitles.add(rev.getString("name"));
+                }
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
-            loadDetails(sel.movieTitle, sel.movieRating, sel.movieDate, sel.movieURL, sel.moviePlot, vidString, n, reviews);
+            loadDetails(sel.movieTitle, sel.movieRating, sel.movieDate, sel.movieURL, sel.moviePlot, videoKeys, videoTitles, n, reviews);
             return null;
         }
     }
