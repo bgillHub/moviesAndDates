@@ -21,7 +21,6 @@ public final class OpenMovieDataUtils {
     private  OpenMovieDataUtils(){}
     private static final String OWM_MESSAGE_CODE = "cod";
 
-    //ToDo: this method collects the previous favorites!!
     public static ContentValues[] getMoviePages(Context context, String jsonResponse) throws JSONException {
         JSONObject movieJson = new JSONObject(jsonResponse);
         /* Is there an error? */

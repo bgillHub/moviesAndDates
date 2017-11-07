@@ -112,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements
             }
             new MovieLoader(this, search);
         }
-        //ToDo: Add params for long term settings?
 
     }
 

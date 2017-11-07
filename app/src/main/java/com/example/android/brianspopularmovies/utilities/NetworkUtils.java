@@ -79,10 +79,9 @@ public final class NetworkUtils {
         return url;
     }
 
-    public static URL buildUrl(int movieQuery) {
+     static URL buildUrl(int movieQuery) {
 
         String passURL = QUERY_BASE;
-        //ToDo: Alt case for favorites
         if( movieQuery == 1) {
             passURL += POP_MOVIE_URL+QUERY_KEY;
         }
@@ -90,7 +89,6 @@ public final class NetworkUtils {
             passURL += TOP_MOVIE_URL+QUERY_KEY;
         }
         else if (movieQuery == 0){
-            //ToDo: Here
         }
         Uri builtUri = Uri.parse(passURL).buildUpon()
                 .appendQueryParameter(VOTE_MINIMUM, "500")
@@ -138,7 +136,6 @@ public final class NetworkUtils {
 
     public static URL buildYTUrl(int movieID) {
         String passURL = QUERY_BASE;
-        //ToDo: Alt case for favorites
         passURL += ("/".concat(String.valueOf(movieID)).concat("/videos?").concat(QUERY_KEY));
         Uri builtUri = Uri.parse(passURL).buildUpon()
                 .build();
@@ -159,7 +156,6 @@ public final class NetworkUtils {
 
     public static URL buildReviewUrl(int movieID) {
         String passURL = QUERY_BASE;
-        //ToDo: Alt case for favorites
         passURL += ("/".concat(String.valueOf(movieID)).concat("/reviews?").concat(QUERY_KEY));
         Uri builtUri = Uri.parse(passURL).buildUpon()
                 .build();
