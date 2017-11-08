@@ -56,8 +56,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onResume() {
         super.onResume();
-        getSupportLoaderManager().restartLoader(ID_LOADER, null, this);
-        SyncUtils.initialize(this);
        // new MovieLoader(this, 1);
     }
     @Override
@@ -74,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements
         moviesArea.setAdapter(mPosterAdapter);
         moviesArea.setHasFixedSize(true);
         moviesArea.setLayoutManager(new GridLayoutManager(this, 3));
+        getSupportLoaderManager().restartLoader(ID_LOADER, null, this);
+        SyncUtils.initialize(this);
       //  getSupportLoaderManager().initLoader(ID_LOADER, null, this);
         //SyncUtils.initialize(this);
     }
@@ -104,9 +104,10 @@ public class MainActivity extends AppCompatActivity implements
             data.moveToFirst();
             favorites = new ArrayList<>();
             try {
-                while (data.moveToNext()) {
+                do {
                     favorites.add(data.getInt(0));
                 }
+                while (data.moveToNext());
             } finally {
                 data.close();
             }
