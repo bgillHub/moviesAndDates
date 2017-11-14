@@ -50,16 +50,23 @@ public class MovieDetailsActivity extends AppCompatActivity {
         final int movieId = intent.getIntExtra("passedId", -1);
         final ArrayList movieReviews =  intent.getParcelableArrayListExtra("passedReviews");
         Cursor faves = getContentResolver().query(MoviesContract.MovieEntry.CONTENT_URI, null, null, null, null);
-        if (faves != null) {
-            faves.moveToFirst();
-        while (faves.moveToNext())
+        if (faves != null)
         {
-            if (faves.getInt(0) == movieId) {
-                globalState = true;
-                stateChange(true);
+            faves.moveToFirst();
+            if (faves.getCount() > 0)
+            {
+                do
+                {
+                    int cursorInt = faves.getInt(0);
+                    if (cursorInt == movieId)
+                    {
+                        globalState = true;
+                        stateChange(true);
+                    }
+                }
+                while (faves.moveToNext());
             }
-        }
-        faves.close();
+            faves.close();
         }
         final ArrayList<String> urls = intent.getStringArrayListExtra("passedVideoKey");
         final ArrayList<String> titles = intent.getStringArrayListExtra("passedVideoTitle");
@@ -173,7 +180,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
             detailsDialog.dismiss();
 
         }
-        else if (trailerDialog != null)
+        if (trailerDialog != null)
         {
             outState.putBoolean(OPEN_TRAILERS, trailerDialog.isShowing());
             trailerDialog.dismiss();

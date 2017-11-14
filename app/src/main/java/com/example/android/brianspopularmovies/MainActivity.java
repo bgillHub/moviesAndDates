@@ -104,10 +104,12 @@ public class MainActivity extends AppCompatActivity implements
             data.moveToFirst();
             favorites = new ArrayList<>();
             try {
+                if (data.getCount() > 0){
                 do {
                     favorites.add(data.getInt(0));
                 }
                 while (data.moveToNext());
+            }
             } finally {
                 data.close();
             }
